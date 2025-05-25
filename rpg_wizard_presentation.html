@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wizard of RPG: Mauricio Costa's Interactive Journey</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Application Structure Plan:
+        A single-page application (SPA) designed as a comprehensive slideshow. Each distinct content block from the source report is now its own "slide" within a main container.
+        The top navigation bar provides quick jumps to the *first slide* of major sections (Home, About Me, Services & Pricing, Case Study, Lessons Learned).
+        "Previous" and "Next" buttons allow sequential navigation through all individual slides.
+        This granular slideshow structure ensures that all content is presented one piece at a time, mimicking a presentation flow, which enhances focus and understanding for an oral exam context. The navigation allows both broad section jumps and detailed step-by-step progression.
+    -->
+    <!-- Visualization & Content Choices:
+        1.  Report Info: Project Title & Main Image (PDF Pg 1)
+            Goal: Introduce the theme and Mauricio's brand.
+            Viz/Presentation Method: Prominent hero section with title and image.
+            Interaction: Visual.
+            Justification: Strong initial visual impact and branding.
+            Library/Method: HTML `<img>`, Tailwind CSS.
+        2.  Report Info: "About Me" texts (Personal, Professional, Future Goals)
+            Goal: Provide background information on Mauricio.
+            Viz/Presentation Method: Each as a separate text card, acting as an individual slide.
+            Interaction: Reading, slide navigation.
+            Justification: Breaks down biographical information into digestible chunks.
+            Library/Method: HTML paragraphs, Tailwind CSS.
+        3.  Report Info: "Services Offered" list (PDF Pg 2)
+            Goal: Detail the scope of services.
+            Viz/Presentation Method: Bulleted list (`<ul>`) within a card, as a dedicated slide.
+            Interaction: Reading, slide navigation.
+            Justification: Presents comprehensive service list clearly.
+            Library/Method: HTML, Tailwind CSS.
+        4.  Report Info: Pricing details (PDF Pg 2 - R$120, R$70, $20)
+            Goal: Inform about costs and allow comparison of main local currency packages.
+            Viz/Presentation Method: Text list for all prices, plus a Chart.js bar chart comparing the R$120 and R$70 packages, as a dedicated slide.
+            Interaction: Data visualization (chart), reading, slide navigation.
+            Justification: Visual chart aids in quick comparison of key local prices; text for completeness.
+            Library/Method: Chart.js, HTML, Tailwind CSS.
+        5.  Report Info: Case Study narrative & VTT/Character Sheet Images (PDF Pg 3)
+            Goal: Illustrate practical experience and problem-solving.
+            Viz/Presentation Method: Each distinct part of the narrative (Initial Contact, Offer, Win-Win, Trust) gets its own slide, with integrated placeholder images where appropriate.
+            Interaction: Reading, visual context from images, slide navigation.
+            Justification: Storytelling approach broken into steps for clarity; images provide context.
+            Library/Method: HTML paragraphs, `<img>` (placeholders), Tailwind CSS.
+        6.  Report Info: "Lessons Learned" texts
+            Goal: Share insights and professional philosophy.
+            Viz/Presentation Method: Each key takeaway presented as a separate text card, acting as an individual slide.
+            Interaction: Reading, slide navigation.
+            Justification: Highlights key reflections and learnings in a focused manner.
+            Library/Method: HTML paragraphs, Tailwind CSS.
+        CONFIRMATION: NO SVG graphics used. NO Mermaid JS used.
+    -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9; /* bg-slate-100 */
+            color: #334155; /* text-slate-700 */
+        }
+        html {
+            scroll-behavior: smooth; /* Keep for smooth scrolling to sections if clicked from outside slideshow */
+        }
+        .header {
+            background-color: #6b21a8; /* bg-purple-700 */
+        }
+        .header-title {
+            color: #fffbeb; /* text-amber-50 */
+        }
+        .nav-link {
+            color: #f1f5f9; /* text-slate-100 */
+            @apply px-3 py-2 rounded-md text-sm font-medium hover:bg-purple-600 transition-colors;
+        }
+        .nav-link-active {
+            background-color: #f59e0b; /* bg-amber-500 */
+            color: #3b0764 !important; /* text-purple-900, added !important for specificity */
+        }
+        /* Mobile menu link colors */
+        #mobile-menu .nav-link {
+             color: #f1f5f9 !important; /* text-slate-100 */
+        }
+        #mobile-menu .nav-link-active {
+            background-color: #f59e0b !important; /* bg-amber-500 */
+            color: #3b0764 !important; /* text-purple-900 */
+        }
+        .section-title {
+            color: #6b21a8; /* text-purple-700 */
+            @apply text-3xl font-bold mb-6 text-center;
+        }
+        .card {
+            @apply bg-white p-6 rounded-lg shadow-lg mb-6;
+        }
+        .card-subtitle {
+            color: #d97706; /* text-amber-600 */
+            @apply text-2xl font-semibold mb-3;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px; /* Adjusted for better fit */
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px; 
+            max-height: 350px;
+        }
+        @media (min-width: 768px) { /* md breakpoint */
+            .chart-container {
+                height: 350px;
+            }
+        }
+        img.placeholder-img { /* Class for placeholder images */
+            background-color: #e2e8f0; /* bg-slate-200 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            border: 1px dashed #94a3b8; /* slate-400 */
+            color: #475569; /* slate-600 */
+            min-height: 200px; /* Ensure placeholder has some height */
+        }
+        img.placeholder-img::after {
+            content: attr(alt);
+            font-size: 0.9em;
+            padding: 10px;
+        }
+        /* Slideshow specific styles */
+        .slide-item {
+            display: none; /* Hidden by default */
+            min-height: calc(100vh - 64px - 80px); /* Full viewport height minus header and footer button heights */
+            padding-top: 4rem; /* Adjust for sticky header */
+            padding-bottom: 4rem;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out; /* Smooth transition for slides */
+            flex-direction: column; /* Ensure content stacks vertically within a slide */
+            text-align: center; /* Center text within slides */
+        }
+        .slide-item.active {
+            display: flex; /* Show active slide */
+            opacity: 1;
+        }
+        .slide-content-wrapper {
+            max-width: 800px; /* Constrain content width for readability */
+            width: 100%;
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <header class="header sticky top-0 z-50 shadow-md">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <a href="#home" class="header-title font-bold text-xl" style="font-family: 'Playfair Display', serif;">Wizard of RPG</a>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#" class="nav-link" data-slide-target="0">Home</a>
+                        <a href="#" class="nav-link" data-slide-target="1">About Me</a>
+                        <a href="#" class="nav-link" data-slide-target="4">Services & Pricing</a>
+                        <a href="#" class="nav-link" data-slide-target="6">Case Study</a>
+                        <a href="#" class="nav-link" data-slide-target="10">Lessons Learned</a>
+                    </div>
+                </div>
+                <div class="-mr-2 flex md:hidden">
+                    <button type="button" id="mobile-menu-button" class="header inline-flex items-center justify-center p-2 rounded-md text-slate-100 hover:text-white hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-purple-700 focus:ring-white" aria-controls="mobile-menu" aria-expanded="false">
+                        <span class="sr-only">Open main menu</span>
+                        <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                        <svg class="hidden h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </nav>
+        <div class="md:hidden hidden header" id="mobile-menu">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#" class="block nav-link" data-slide-target="0">Home</a>
+                <a href="#" class="block nav-link" data-slide-target="1">About Me</a>
+                <a href="#" class="block nav-link" data-slide-target="4">Services & Pricing</a>
+                <a href="#" class="block nav-link" data-slide-target="6">Case Study</a>
+                <a href="#" class="block nav-link" data-slide-target="10">Lessons Learned</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <div id="slides-container" class="relative">
+            <div id="slide-0" class="slide-item active">
+                <div class="card slide-content-wrapper">
+                    <h1 class="text-5xl font-bold text-purple-700 mb-4" style="font-family: 'Playfair Display', serif;">Project "Wizard of RPG"</h1>
+                    <p class="text-xl text-slate-600 mb-8">"Good morning, everyone. Today, I'll be talking about my project, 'Mago do RPG,' which translates to 'Wizard of RPG.' This project is about my work as a professional tabletop RPG Gamemaster. The image you see here perfectly represents the spirit of what I do, combining elements of magic and tabletop gaming."</p>
+                    <img src="main.png"
+                         alt="Wizard of RPG illustration with wizard hat and RPG dice (Image from PDF Page 1)"
+                         class="placeholder-img rounded-lg shadow-xl mx-auto mb-4 max-w-md h-auto"
+                         onerror="this.classList.add('placeholder-img'); this.src='https://placehold.co/800x500/e2e8f0/475569?text=Image+Load+Error';">
+                    <p class="text-sm text-slate-500">Navigate this interactive site to explore Mauricio's journey, services, and key learnings as a professional Gamemaster.</p>
+                </div>
+            </div>
+
+            <div id="slide-1" class="slide-item">
+                <div class="card slide-content-wrapper">
+                    <h2 class="section-title">About Me</h2>
+                    <p class="text-center text-slate-600 mb-10 max-w-2xl mx-auto">"Let me start by introducing myself. My name is Mauricio Ramos Canavarro Costa." This section delves into his personal background, current professional endeavors, and aspirations for the future, painting a complete picture of the Wizard of RPG.</p>
+                    <h3 class="card-subtitle">Personal Background</h3>
+                    <p>"I was born in Rio de Janeiro on March 30th, 1988, and spent my childhood and teenage years in Barra da Tijuca. Growing up, my family wasn't wealthy and couldn't afford many things, so I learned the value of independence early on, starting work right after high school. My upbringing was quite strict and repressive, and I didn't experience much personal freedom until I became an adult. This background has definitely shaped my drive for self-reliance."</p>
+                </div>
+            </div>
+
+            <div id="slide-2" class="slide-item">
+                <div class="card slide-content-wrapper">
+                    <h2 class="section-title">About Me</h2>
+                    <p class="text-center text-slate-600 mb-10 max-w-2xl mx-auto">This section presents Mauricio's personal and professional journey, the Wizard of RPG. Get to know his story, his current activities, and his plans for the future, which shape his identity as a Gamemaster.</p>
+                    <h3 class="card-subtitle">Professional Life</h3>
+                    <p>"Currently, I work as a professional tabletop RPG Gamemaster. My job involves creating and running online RPG sessions, which I find both challenging and incredibly rewarding. I'm also expanding my skills by studying to become a Traffic Manager and an AI chatbot salesperson, which I believe will open up new opportunities. My daily life is quite busy: I manage household tasks, prepare my game sessions, and handle the IT infrastructure for them. A major part of my work involves studying various RPG systems and running games online, using specialized software."</p>
+                </div>
+            </div>
+
+            <div id="slide-3" class="slide-item">
+                <div class="card slide-content-wrapper">
+                    <h2 class="section-title">About Me</h2>
+                    <p class="text-center text-slate-600 mb-10 max-w-2xl mx-auto">This section presents Mauricio's personal and professional journey, the Wizard of RPG. Get to know his story, his current activities, and his plans for the future, which shape his identity as a Gamemaster.</p>
+                    <h3 class="card-subtitle">Future Goals</h3>
+                    <p>"Looking ahead, my goal is to expand my Game Master services to international clientele. As I improve my English, I believe this will allow me to reach a global audience and establish a solid income stream. With this financial stability, I plan to invest in diverse business areas, ultimately becoming an entrepreneur across multiple sectors. This is a key part of my long-term vision."</p>
+                </div>
+            </div>
+
+            <div id="slide-4" class="slide-item">
+                <div class="card slide-content-wrapper">
+                    <h2 class="section-title">Services & Pricing</h2>
+                    <p class="text-center text-slate-600 mb-10 max-w-2xl mx-auto">"Now, let's look at what my service offers." This section details the comprehensive offerings of the Wizard of RPG, from the technical infrastructure to the gaming experience, along with the pricing structure. An interactive chart helps compare the main local currency packages.</p>
+                    <h3 class="card-subtitle">What the Service Offers:</h3>
+                    <ul class="list-disc list-inside space-y-2 text-slate-700 text-left mx-auto max-w-xl">
+                        <li>"Dedicated Gamemaster and Storyteller, backed by around 25 years of experience in RPG."</li>
+                        <li>"I manage all the necessary IT infrastructure, including virtual tabletop software with all its features, a dedicated Oracle Cloud server, a Discord server, and a blog with game information."</li>
+                        <li>"Clients also receive 24-hour support via WhatsApp and access to a virtual drive with reference books."</li>
+                        <li>"I also handle digital marketing to attract new players and ensure player rotation."</li>
+                        <li>"My service also includes a commitment to a segregation-free social contract, and I use virtual grid maps with various effects like animations, dynamic lighting, and unique designs."</li>
+                        <li>"I utilize Foundry VTT, which is excellent and has many installed modules."</li>
+                        <li>"I offer many game systems and online tables for the most played games, with a sandbox storytelling style, and I even record audio from sessions for listening on Spotify or YouTube."</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div id="slide-5" class="slide-item">
+                <div class="card slide-content-wrapper">
+                    <h2 class="section-title">Services & Pricing</h2>
+                    <p class="text-center text-slate-600 mb-10 max-w-2xl mx-auto">This section details the comprehensive offerings of the Wizard of RPG, from the technical infrastructure to the gaming experience, along with the pricing structure. An interactive chart helps compare the main local currency packages.</p>
+                    <h3 class="card-subtitle">Pricing Details:</h3>
+                    <p class="text-slate-600 mb-4">"Regarding pricing:"</p>
+                    <ul class="list-none space-y-3 text-slate-700 mb-6 text-left mx-auto max-w-xl">
+                        <li><strong class="text-purple-700">D&D weekly:</strong> "R$120.00 per person per month for four four-hour sessions."</li>
+                        <li><strong class="text-purple-700">Online RPG tables bi-weekly:</strong> "R$70.00 per person per month for two four-hour sessions."</li>
+                        <li><strong class="text-purple-700">English sessions:</strong> "Approximately $20.00 per head."</li>
+                    </ul>
+                    <p class="text-sm text-amber-600 font-semibold mb-6">"Please note that prices will increase next semester!"</p>
+                    
+                    <h4 class="text-xl font-semibold text-amber-600 mb-3">Pricing Comparison (R$):</h4>
+                    <div class="chart-container">
+                        <canvas id="pricingChart"></canvas>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-2 text-center">This chart visually compares the monthly costs for the D&D weekly and biweekly RPG table services in Brazilian Reals.</p>
+                </div>
+            </div>
+
+            <div id="slide-6" class="slide-item">
+                <div class="card slide-content-wrapper">
+                    <h2 class="section-title">Case Study: A Negotiation Success</h2>
+                    <p class="text-center text-slate-600 mb-10 max-w-2xl mx-auto">"Moving on to a specific situation..." This case study recounts an experience where Mauricio successfully negotiated with new clients, highlighting his flexible approach and focus on mutual benefit. It demonstrates how initial hesitation was transformed into a strong, long-term client relationship.</p>
+                    <h3 class="card-subtitle">Initial Contact & Client Hesitation</h3>
+                    <p>"Some time ago, I was contacted on Facebook by a player who was representing two other individuals. They were looking for a professional paid Dungeons & Dragons game. They contacted me because I was running a D&D campaign at that time. While we were talking, he explained that they were undecided about joining the group because they used to prefer campaigns with more exploration and combat rather than heavy roleplay."</p>
+                </div>
+            </div>
+
+            <div id="slide-7" class="slide-item">
+                <div class="card slide-content-wrapper">
+                    <h2 class="section-title">Case Study: A Negotiation Success</h2>
+                    <p class="text-center text-slate-600 mb-10 max-w-2xl mx-auto">This case study recounts an experience where Mauricio successfully negotiated with new clients, highlighting his flexible approach and focus on mutual benefit. It demonstrates how initial hesitation was transformed into a strong, long-term client relationship.</p>
+                    <h3 class="card-subtitle">The Offer and Negotiation</h3>
+                    <p>"To address their hesitation, I believed a flexible solution was the best choice in that situation. So, I offered them a 20% discount for the first month if they decided to hire me. From my perspective, this was a reasonable offer, considering they were a group of three clients joining at once. During our negotiation, I set only one condition: all of them had to participate in the free Session Zero together. They agreed, and everything went very smoothly. As a great outcome, the game continued for several months, and they even renewed their subscription for a second campaign, this time paying the full price."</p>
+                </div>
+            </div>
+
+            <div id="slide-8" class="slide-item">
+                <div class="card slide-content-wrapper lg:flex lg:items-center lg:gap-8">
+                    <div class="lg:w-1/2">
+                        <h2 class="section-title">Case Study: A Negotiation Success</h2>
+                        <h3 class="card-subtitle">Consequences: A Win-Win Outcome</h3>
+                        <p>"This situation truly was a win-win for everyone involved. From their perspective, they found the Game Master they were looking for, offering the playstyle they preferred, and they even received a discount for the first month. On my side, I successfully acquired three new clients at once, who later became loyal customers. Initially, they had some doubts about paying for a professional Game Master, but once they experienced the quality of my work, those doubts completely disappeared."</p>
+                    </div>
+                     <img src="dnd1.png" 
+                         alt="Illustrative placeholder for a Virtual Tabletop in-game view (From PDF Page 3)" 
+                         class="placeholder-img rounded-lg shadow-lg mt-4 lg:mt-0 lg:w-1/2 mx-auto max-w-full h-auto"
+                         onerror="this.classList.add('placeholder-img'); this.src='https://placehold.co/500x300/e2e8f0/475569?text=Image+Error';">
+                </div>
+            </div>
+
+            <div id="slide-9" class="slide-item">
+                <div class="card slide-content-wrapper lg:flex lg:items-center lg:gap-8">
+                     <img src="dnd2.png" 
+                         alt="Illustrative placeholder for a VTT character sheet view (From PDF Page 3)" 
+                         class="placeholder-img rounded-lg shadow-lg mb-4 lg:mb-0 lg:w-1/2 mx-auto max-w-full h-auto"
+                         onerror="this.classList.add('placeholder-img'); this.src='https://placehold.co/500x350/e2e8f0/475569?text=Image+Error';">
+                    <div class="lg:w-1/2">
+                        <h2 class="section-title">Case Study: A Negotiation Success</h2>
+                        <h3 class="card-subtitle">Building Trust & Strong Relationships</h3>
+                        <p>"As a result of this positive experience, the trust between us increased significantly. Our professional relationship became much stronger, and they could clearly see that I was the right Game Master for them. This happened because they realized that my sessions provided exactly the experience they were looking for, effectively combining the right amount of combat, exploration, and, most importantly, fun."</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="slide-10" class="slide-item">
+                <div class="card slide-content-wrapper">
+                    <h2 class="section-title">Lessons Learned</h2>
+                    <p class="text-center text-slate-600 mb-10 max-w-2xl mx-auto">"In conclusion..." This final section shares the valuable insights Mauricio gained from his experiences, particularly the negotiation case study. These reflections underscore his professional growth and approach to client relationships and service adaptation.</p>
+                    <h3 class="card-subtitle">More Than Just Money</h3>
+                    <p>"What I gained from this negotiation was much more than just financial compensation. I built trust with these clients, strengthened my professional reputation, and established long-term relationships. These outcomes are incredibly valuable and will undoubtedly make a huge positive difference in my career going forward."</p>
+                </div>
+            </div>
+
+            <div id="slide-11" class="slide-item">
+                <div class="card slide-content-wrapper">
+                    <h2 class="section-title">Lessons Learned</h2>
+                    <p class="text-center text-slate-600 mb-10 max-w-2xl mx-auto">This final section shares the valuable insights Mauricio gained from his experiences, particularly the negotiation case study. These reflections underscore his professional growth and approach to client relationships and service adaptation.</p>
+                    <h3 class="card-subtitle">Confidence and Flexibility in Negotiation</h3>
+                    <p>"Nowadays, I approach similar negotiations with much more confidence. I've learned that offering flexible solutions is key to attracting and retaining good clients. I firmly believe that in any deal, both sides should feel like they are winning, so I always try to listen carefully and find solutions that fit both the client's needs and my own."</p>
+                </div>
+            </div>
+
+            <div id="slide-12" class="slide-item">
+                <div class="card slide-content-wrapper">
+                    <h2 class="section-title">Lessons Learned</h2>
+                    <p class="text-center text-slate-600 mb-10 max-w-2xl mx-auto">This final section shares the valuable insights Mauricio gained from his experiences, particularly the negotiation case study. These reflections underscore his professional growth and approach to client relationships and service adaptation.</p>
+                    <h3 class="card-subtitle">Adaptation and Strategic Sacrifice</h3>
+                    <p>"This experience taught me the importance of adapting my service when needed, as long as it doesn't compromise my quality or professional integrity. It also showed me that a small sacrifice, like a temporary discount, can lead to significantly larger gains in the future. I believe I made the right decision by offering the discount; if I had insisted on the full price from the start, they might not have joined. Therefore, I will likely use this strategy again if I encounter a similar situation, because it truly works."</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="fixed bottom-4 left-1/2 -translate-x-1/2 flex space-x-4 z-50">
+        <button id="prev-slide" class="px-6 py-3 bg-purple-700 text-white rounded-full shadow-lg hover:bg-purple-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+            &#9664; Previous
+        </button>
+        <button id="next-slide" class="px-6 py-3 bg-purple-700 text-white rounded-full shadow-lg hover:bg-purple-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+            Next &#9654;
+        </button>
+    </div>
+
+    <footer class="header text-amber-50 py-8 text-center">
+        <p>&copy; <span id="currentYear"></span> Wizard of RPG - Mauricio Ramos Canavarro Costa. All rights reserved.</p>
+        <p class="text-xs mt-1 text-slate-300">Content based on "Lesson 4.pdf" material. Placeholder images used.</p>
+    </footer>
+
+    <script>
+        // Mobile menu toggle
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        mobileMenuButton.addEventListener('click', () => {
+            const expanded = mobileMenuButton.getAttribute('aria-expanded') === 'true' || false;
+            mobileMenuButton.setAttribute('aria-expanded', !expanded);
+            mobileMenu.classList.toggle('hidden');
+            mobileMenuButton.querySelector('svg:first-child').classList.toggle('hidden');
+            mobileMenuButton.querySelector('svg:last-child').classList.toggle('hidden');
+        });
+
+        // Slideshow logic
+        const slides = document.querySelectorAll('.slide-item');
+        const navLinks = document.querySelectorAll('.nav-link');
+        const prevButton = document.getElementById('prev-slide');
+        const nextButton = document.getElementById('next-slide');
+        let currentSlideIndex = 0;
+
+        // Map section targets to their first slide index for navigation
+        const sectionToSlideIndexMap = {
+            'home': 0,
+            'about-me': 1,
+            'services': 4,
+            'case-study': 6,
+            'lessons': 10
+        };
+
+        function showSlide(index) {
+            if (index < 0 || index >= slides.length) {
+                return;
+            }
+
+            // Hide all slides
+            slides.forEach(slide => {
+                slide.classList.remove('active');
+            });
+
+            // Show the current slide
+            slides[index].classList.add('active');
+            currentSlideIndex = index;
+
+            // Update navigation buttons state
+            prevButton.disabled = currentSlideIndex === 0;
+            nextButton.disabled = currentSlideIndex === slides.length - 1;
+
+            // Update active navigation link
+            navLinks.forEach(link => link.classList.remove('nav-link-active'));
+            // Find the main section corresponding to the current slide and activate its nav link
+            let activeSectionId = '';
+            for (const sectionKey in sectionToSlideIndexMap) {
+                if (currentSlideIndex >= sectionToSlideIndexMap[sectionKey]) {
+                    activeSectionId = sectionKey;
+                }
+            }
+            const activeNavLink = document.querySelector(`.nav-link[data-section="${activeSectionId}"]`);
+            if (activeNavLink) {
+                activeNavLink.classList.add('nav-link-active');
+            }
+        }
+
+        prevButton.addEventListener('click', () => showSlide(currentSlideIndex - 1));
+        nextButton.addEventListener('click', () => showSlide(currentSlideIndex + 1));
+
+        // Navigation links click handler
+        navLinks.forEach(link => {
+            link.addEventListener('click', (event) => {
+                event.preventDefault(); // Prevent default anchor jump
+                const targetSectionId = link.dataset.section;
+                const targetIndex = sectionToSlideIndexMap[targetSectionId];
+                if (targetIndex !== undefined) {
+                    showSlide(targetIndex);
+                }
+                // Close mobile menu if open
+                if (!mobileMenu.classList.contains('hidden')) {
+                    mobileMenu.classList.add('hidden');
+                    mobileMenuButton.setAttribute('aria-expanded', 'false');
+                    mobileMenuButton.querySelector('svg:first-child').classList.remove('hidden');
+                    mobileMenuButton.querySelector('svg:last-child').classList.add('hidden');
+                }
+            });
+        });
+
+        // Initial load
+        showSlide(0); // Show the first slide on load
+
+        // Footer current year
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+        // Chart.js: Pricing Chart
+        const pricingChartCanvas = document.getElementById('pricingChart');
+        if (pricingChartCanvas) {
+            const ctx = pricingChartCanvas.getContext('2d');
+            const pricingChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['D&D Weekly (R$)', 'RPG Bi-weekly (R$)'],
+                    datasets: [{
+                        label: 'Monthly Cost per Head',
+                        data: [120, 70],
+                        backgroundColor: [
+                            'rgba(107, 33, 168, 0.7)', /* purple-700 with opacity */
+                            'rgba(217, 119, 6, 0.7)'  /* amber-600 with opacity */
+                        ],
+                        borderColor: [
+                            'rgba(91, 33, 182, 1)', /* purple-800 */
+                            'rgba(180, 83, 9, 1)'   /* amber-700 */
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false, 
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return 'R$' + value;
+                                },
+                                color: '#475569' /* slate-600 */
+                            },
+                            grid: {
+                                color: '#cbd5e1' /* slate-300 */
+                            }
+                        },
+                        x: {
+                           ticks: {
+                                color: '#475569', /* slate-600 */
+                                maxRotation: 0, /* Prevent label rotation */
+                                minRotation: 0,
+                                autoSkip: false, /* Show all labels */
+                                callback: function(value, index, values) {
+                                    const label = this.getLabelForValue(value);
+                                    if (label.length > 15) { /* Example length */
+                                        return label.match(/.{1,15}/g); /* Split into lines of 15 chars */
+                                    }
+                                    return label;
+                                }
+                            },
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                color: '#475569' /* slate-600 */
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': R$' + context.parsed.y;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
