@@ -3,54 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wizard of RPG: Mauricio Costa's Interactive Journey</title>
+    <title>RPG Wizard: Mauricio Costa's Interactive Journey (Text Fidelity)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Application Structure Plan:
-        A single-page application (SPA) designed as a comprehensive slideshow. Each distinct content block from the source report is now its own "slide" within a main container.
-        The top navigation bar provides quick jumps to the *first slide* of major sections (Home, About Me, Services & Pricing, Case Study, Lessons Learned).
-        "Previous" and "Next" buttons allow sequential navigation through all individual slides.
-        This granular slideshow structure ensures that all content is presented one piece at a time, mimicking a presentation flow, which enhances focus and understanding for an oral exam context. The navigation allows both broad section jumps and detailed step-by-step progression.
-    -->
-    <!-- Visualization & Content Choices:
-        1.  Report Info: Project Title & Main Image (PDF Pg 1)
-            Goal: Introduce the theme and Mauricio's brand.
-            Viz/Presentation Method: Prominent hero section with title and image.
-            Interaction: Visual.
-            Justification: Strong initial visual impact and branding.
-            Library/Method: HTML `<img>`, Tailwind CSS.
-        2.  Report Info: "About Me" texts (Personal, Professional, Future Goals)
-            Goal: Provide background information on Mauricio.
-            Viz/Presentation Method: Each as a separate text card, acting as an individual slide.
-            Interaction: Reading, slide navigation.
-            Justification: Breaks down biographical information into digestible chunks.
-            Library/Method: HTML paragraphs, Tailwind CSS.
-        3.  Report Info: "Services Offered" list (PDF Pg 2)
-            Goal: Detail the scope of services.
-            Viz/Presentation Method: Bulleted list (`<ul>`) within a card, as a dedicated slide.
-            Interaction: Reading, slide navigation.
-            Justification: Presents comprehensive service list clearly.
-            Library/Method: HTML, Tailwind CSS.
-        4.  Report Info: Pricing details (PDF Pg 2 - R$120, R$70, $20)
-            Goal: Inform about costs and allow comparison of main local currency packages.
-            Viz/Presentation Method: Text list for all prices, plus a Chart.js bar chart comparing the R$120 and R$70 packages, as a dedicated slide.
-            Interaction: Data visualization (chart), reading, slide navigation.
-            Justification: Visual chart aids in quick comparison of key local prices; text for completeness.
-            Library/Method: Chart.js, HTML, Tailwind CSS.
-        5.  Report Info: Case Study narrative & VTT/Character Sheet Images (PDF Pg 3)
-            Goal: Illustrate practical experience and problem-solving.
-            Viz/Presentation Method: Each distinct part of the narrative (Initial Contact, Offer, Win-Win, Trust) gets its own slide, with integrated placeholder images where appropriate.
-            Interaction: Reading, visual context from images, slide navigation.
-            Justification: Storytelling approach broken into steps for clarity; images provide context.
-            Library/Method: HTML paragraphs, `<img>` (placeholders), Tailwind CSS.
-        6.  Report Info: "Lessons Learned" texts
-            Goal: Share insights and professional philosophy.
-            Viz/Presentation Method: Each key takeaway presented as a separate text card, acting as an individual slide.
-            Interaction: Reading, slide navigation.
-            Justification: Highlights key reflections and learnings in a focused manner.
-            Library/Method: HTML paragraphs, Tailwind CSS.
-        CONFIRMATION: NO SVG graphics used. NO Mermaid JS used.
-    -->
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -154,15 +109,15 @@
         <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <div class="flex items-center">
-                    <a href="#home" class="header-title font-bold text-xl" style="font-family: 'Playfair Display', serif;">Wizard of RPG</a>
+                    <a href="#home" class="header-title font-bold text-xl" style="font-family: 'Playfair Display', serif;">RPG Wizard</a>
                 </div>
                 <div class="hidden md:block">
                     <div class="ml-10 flex items-baseline space-x-4">
-                        <a href="#" class="nav-link" data-slide-target="0">Home</a>
-                        <a href="#" class="nav-link" data-slide-target="1">About Me</a>
-                        <a href="#" class="nav-link" data-slide-target="4">Services & Pricing</a>
-                        <a href="#" class="nav-link" data-slide-target="6">Case Study</a>
-                        <a href="#" class="nav-link" data-slide-target="10">Lessons Learned</a>
+                        <a href="#" class="nav-link" data-section="home" data-slide-target="0">Home</a>
+                        <a href="#" class="nav-link" data-section="about-me" data-slide-target="1">About Me</a>
+                        <a href="#" class="nav-link" data-section="services" data-slide-target="4">Services & Pricing</a>
+                        <a href="#" class="nav-link" data-section="case-study" data-slide-target="6">Case Study</a>
+                        <a href="#" class="nav-link" data-section="lessons" data-slide-target="10">Lessons Learned</a>
                     </div>
                 </div>
                 <div class="-mr-2 flex md:hidden">
@@ -180,11 +135,11 @@
         </nav>
         <div class="md:hidden hidden header" id="mobile-menu">
             <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                <a href="#" class="block nav-link" data-slide-target="0">Home</a>
-                <a href="#" class="block nav-link" data-slide-target="1">About Me</a>
-                <a href="#" class="block nav-link" data-slide-target="4">Services & Pricing</a>
-                <a href="#" class="block nav-link" data-slide-target="6">Case Study</a>
-                <a href="#" class="block nav-link" data-slide-target="10">Lessons Learned</a>
+                <a href="#" class="block nav-link" data-section="home" data-slide-target="0">Home</a>
+                <a href="#" class="block nav-link" data-section="about-me" data-slide-target="1">About Me</a>
+                <a href="#" class="block nav-link" data-section="services" data-slide-target="4">Services & Pricing</a>
+                <a href="#" class="block nav-link" data-section="case-study" data-slide-target="6">Case Study</a>
+                <a href="#" class="block nav-link" data-section="lessons" data-slide-target="10">Lessons Learned</a>
             </div>
         </div>
     </header>
@@ -194,10 +149,10 @@
         <div id="slides-container" class="relative">
             <div id="slide-0" class="slide-item active">
                 <div class="card slide-content-wrapper">
-                    <h1 class="text-5xl font-bold text-purple-700 mb-4" style="font-family: 'Playfair Display', serif;">Project "Wizard of RPG"</h1>
-                    <p class="text-xl text-slate-600 mb-8">"Good morning, everyone. Today, I'll be talking about my project, 'Mago do RPG,' which translates to 'Wizard of RPG.' This project is about my work as a professional tabletop RPG Gamemaster. The image you see here perfectly represents the spirit of what I do, combining elements of magic and tabletop gaming."</p>
+                    <h1 class="text-5xl font-bold text-purple-700 mb-4" style="font-family: 'Playfair Display', serif;">Project "Mago do RPG" (Wizard of RPG) [cite: 1]</h1>
+                    <p class="text-xl text-slate-600 mb-8">"Good morning, everyone. Today, I'll be talking about my project, 'Mago do RPG,' which translates to 'Wizard of RPG.' The image you see here perfectly represents the spirit of what I do, combining elements of magic and tabletop gaming."</p>
                     <img src="main.png"
-                         alt="Wizard of RPG illustration with wizard hat and RPG dice (Image from PDF Page 1)"
+                         alt="RPG Wizard illustration with wizard hat and RPG dice (Image from PDF Page 1)"
                          class="placeholder-img rounded-lg shadow-xl mx-auto mb-4 max-w-md h-auto"
                          onerror="this.classList.add('placeholder-img'); this.src='https://placehold.co/800x500/e2e8f0/475569?text=Image+Load+Error';">
                     <p class="text-sm text-slate-500">Navigate this interactive site to explore Mauricio's journey, services, and key learnings as a professional Gamemaster.</p>
@@ -206,60 +161,60 @@
 
             <div id="slide-1" class="slide-item">
                 <div class="card slide-content-wrapper">
-                    <h2 class="section-title">About Me</h2>
-                    <p class="text-center text-slate-600 mb-10 max-w-2xl mx-auto">"Let me start by introducing myself. My name is Mauricio Ramos Canavarro Costa." This section delves into his personal background, current professional endeavors, and aspirations for the future, painting a complete picture of the Wizard of RPG.</p>
+                    <h2 class="section-title">Part 1 - Talk About Yourself [cite: 1]</h2>
                     <h3 class="card-subtitle">Personal Background</h3>
-                    <p>"I was born in Rio de Janeiro on March 30th, 1988, and spent my childhood and teenage years in Barra da Tijuca. Growing up, my family wasn't wealthy and couldn't afford many things, so I learned the value of independence early on, starting work right after high school. My upbringing was quite strict and repressive, and I didn't experience much personal freedom until I became an adult. This background has definitely shaped my drive for self-reliance."</p>
+                    <p class="text-slate-700 mb-4">My name is Mauricio Ramos Canavarro Costa. [cite: 1]</p>
+                    <p class="text-slate-700 mb-4">I was born in Rio de Janeiro on March 30th, 1988. [cite: 2] I grew up in Barra da Tijuca, where I spent my childhood and teenage years. [cite: 2]</p>
+                    <p class="text-slate-700 mb-4">I didn't use to have a wealthy life when I was young. [cite: 3] My family couldn't afford many things, so I only started making money when I finished high school and began working. [cite: 4]</p>
+                    <p class="text-slate-700 mb-4">When I was growing up, I was always thinking about how I could become independent one day. [cite: 5] While my friends were enjoying more freedom, I was following strict rules at home. [cite: 6] My education was very rigid and quite repressive, so I wasn't used to having much freedom. [cite: 7] I could only experience more independence when I became an adult. [cite: 8]</p>
                 </div>
             </div>
 
             <div id="slide-2" class="slide-item">
                 <div class="card slide-content-wrapper">
-                    <h2 class="section-title">About Me</h2>
-                    <p class="text-center text-slate-600 mb-10 max-w-2xl mx-auto">This section presents Mauricio's personal and professional journey, the Wizard of RPG. Get to know his story, his current activities, and his plans for the future, which shape his identity as a Gamemaster.</p>
+                    <h2 class="section-title">Part 1 - Talk About Yourself [cite: 1]</h2>
                     <h3 class="card-subtitle">Professional Life</h3>
-                    <p>"Currently, I work as a professional tabletop RPG Gamemaster. My job involves creating and running online RPG sessions, which I find both challenging and incredibly rewarding. I'm also expanding my skills by studying to become a Traffic Manager and an AI chatbot salesperson, which I believe will open up new opportunities. My daily life is quite busy: I manage household tasks, prepare my game sessions, and handle the IT infrastructure for them. A major part of my work involves studying various RPG systems and running games online, using specialized software."</p>
+                    <p class="text-slate-700 mb-4">Nowadays, I work as a professional tabletop RPG Gamemaster. [cite: 9] I'm hired to create and run online RPG sessions. It can be very challenging sometimes, but it is also very rewarding. [cite: 10]</p>
+                    <p class="text-slate-700 mb-4">I'm also studying to become a Traffic Manager and an Al chatbot salesperson, which may open new opportunities for my future. [cite: 11]</p>
+                    <p class="text-slate-700 mb-4">My daily routine is pretty busy. I usually clean my house, cook, go grocery shopping, prepare my RPG sessions, and take care of the IT infrastructure for my games. [cite: 12] I'm used to studying different RPGs, including their rules and scenarios. [cite: 13] Of course, a big part of my day is running games online using specific software for that. [cite: 14]</p>
                 </div>
             </div>
 
             <div id="slide-3" class="slide-item">
                 <div class="card slide-content-wrapper">
-                    <h2 class="section-title">About Me</h2>
-                    <p class="text-center text-slate-600 mb-10 max-w-2xl mx-auto">This section presents Mauricio's personal and professional journey, the Wizard of RPG. Get to know his story, his current activities, and his plans for the future, which shape his identity as a Gamemaster.</p>
+                    <h2 class="section-title">Part 1 - Talk About Yourself [cite: 1]</h2>
                     <h3 class="card-subtitle">Future Goals</h3>
-                    <p>"Looking ahead, my goal is to expand my Game Master services to international clientele. As I improve my English, I believe this will allow me to reach a global audience and establish a solid income stream. With this financial stability, I plan to invest in diverse business areas, ultimately becoming an entrepreneur across multiple sectors. This is a key part of my long-term vision."</p>
+                    <p class="text-slate-700 mb-4">In the future, I will offer my Game Master services to international clients as I improve my English. [cite: 15] This might help me reach more people around the world. [cite: 16] I believe I can turn this into a solid source of income. [cite: 17] With this money, I will invest in different business areas because I want to become an entrepreneur in various sectors. [cite: 18]</p>
                 </div>
             </div>
 
             <div id="slide-4" class="slide-item">
                 <div class="card slide-content-wrapper">
-                    <h2 class="section-title">Services & Pricing</h2>
-                    <p class="text-center text-slate-600 mb-10 max-w-2xl mx-auto">"Now, let's look at what my service offers." This section details the comprehensive offerings of the Wizard of RPG, from the technical infrastructure to the gaming experience, along with the pricing structure. An interactive chart helps compare the main local currency packages.</p>
-                    <h3 class="card-subtitle">What the Service Offers:</h3>
+                    <h2 class="section-title">What the service offers: [cite: 19]</h2>
                     <ul class="list-disc list-inside space-y-2 text-slate-700 text-left mx-auto max-w-xl">
-                        <li>"Dedicated Gamemaster and Storyteller, backed by around 25 years of experience in RPG."</li>
-                        <li>"I manage all the necessary IT infrastructure, including virtual tabletop software with all its features, a dedicated Oracle Cloud server, a Discord server, and a blog with game information."</li>
-                        <li>"Clients also receive 24-hour support via WhatsApp and access to a virtual drive with reference books."</li>
-                        <li>"I also handle digital marketing to attract new players and ensure player rotation."</li>
-                        <li>"My service also includes a commitment to a segregation-free social contract, and I use virtual grid maps with various effects like animations, dynamic lighting, and unique designs."</li>
-                        <li>"I utilize Foundry VTT, which is excellent and has many installed modules."</li>
-                        <li>"I offer many game systems and online tables for the most played games, with a sandbox storytelling style, and I even record audio from sessions for listening on Spotify or YouTube."</li>
+                        <li>Dedicated Gamemaster/Storyteller of RPG with knowledge of many game systems and scenarios, around of 25 years of experience with RPG. [cite: 19]</li>
+                        <li>All IT infrastructure for the games. Including software VTT (with sheets, tokens, images, journal, virtual dices, etc), Oracle Cloud dedicated server with own domain, Discord Server, blog with all information about the virtual tables, etc... [cite: 20]</li>
+                        <li>24 hour support on WhatsApp. [cite: 21] Groups with all information in the description. [cite: 21]</li>
+                        <li>Virtual Drive with all reference books. [cite: 21]</li>
+                        <li>Digital Marketing to include new players. [cite: 22] Guaranteed player rotation in case someone drops out. [cite: 22] Game commitment with segregation-free social contract. [cite: 22]</li>
+                        <li>Virtual Grid Maps with animations, special effects, weather effects and dynamic lighting. [cite: 23] Some unique grid maps. [cite: 23]</li>
+                        <li>Foundry VTT, the best of the market. Many installed modules. [cite: 23]</li>
+                        <li>Many options of game systems to play. [cite: 24] Online Tables of the most played games. [cite: 24]</li>
+                        <li>Sandbox style of storytelling. [cite: 24]</li>
+                        <li>Recording of audio from gaming tables, with the option to listen via Spotfy or YouTube. [cite: 25]</li>
                     </ul>
                 </div>
             </div>
 
             <div id="slide-5" class="slide-item">
                 <div class="card slide-content-wrapper">
-                    <h2 class="section-title">Services & Pricing</h2>
-                    <p class="text-center text-slate-600 mb-10 max-w-2xl mx-auto">This section details the comprehensive offerings of the Wizard of RPG, from the technical infrastructure to the gaming experience, along with the pricing structure. An interactive chart helps compare the main local currency packages.</p>
-                    <h3 class="card-subtitle">Pricing Details:</h3>
-                    <p class="text-slate-600 mb-4">"Regarding pricing:"</p>
+                    <h2 class="section-title">How much for this? [cite: 26]</h2>
                     <ul class="list-none space-y-3 text-slate-700 mb-6 text-left mx-auto max-w-xl">
-                        <li><strong class="text-purple-700">D&D weekly:</strong> "R$120.00 per person per month for four four-hour sessions."</li>
-                        <li><strong class="text-purple-700">Online RPG tables bi-weekly:</strong> "R$70.00 per person per month for two four-hour sessions."</li>
-                        <li><strong class="text-purple-700">English sessions:</strong> "Approximately $20.00 per head."</li>
+                        <li><strong class="text-purple-700">D&D weekly:</strong> R$120,00 a month per head (4 sessions of 4 hours). [cite: 26]</li>
+                        <li><strong class="text-purple-700">RPG online tables biweekly:</strong> R$70,00 a month per head (2 sessions of 4 hours). [cite: 27]</li>
+                        <li><strong class="text-purple-700">English sessions:</strong> around of 20 dollars per head. [cite: 28]</li>
                     </ul>
-                    <p class="text-sm text-amber-600 font-semibold mb-6">"Please note that prices will increase next semester!"</p>
+                    <p class="text-sm text-amber-600 font-semibold mb-6">Prices will increase in the next semester! [cite: 28]</p>
                     
                     <h4 class="text-xl font-semibold text-amber-600 mb-3">Pricing Comparison (R$):</h4>
                     <div class="chart-container">
@@ -271,28 +226,28 @@
 
             <div id="slide-6" class="slide-item">
                 <div class="card slide-content-wrapper">
-                    <h2 class="section-title">Case Study: A Negotiation Success</h2>
-                    <p class="text-center text-slate-600 mb-10 max-w-2xl mx-auto">"Moving on to a specific situation..." This case study recounts an experience where Mauricio successfully negotiated with new clients, highlighting his flexible approach and focus on mutual benefit. It demonstrates how initial hesitation was transformed into a strong, long-term client relationship.</p>
+                    <h2 class="section-title">Part 2 - Describe a Situation [cite: 29]</h2>
                     <h3 class="card-subtitle">Initial Contact & Client Hesitation</h3>
-                    <p>"Some time ago, I was contacted on Facebook by a player who was representing two other individuals. They were looking for a professional paid Dungeons & Dragons game. They contacted me because I was running a D&D campaign at that time. While we were talking, he explained that they were undecided about joining the group because they used to prefer campaigns with more exploration and combat rather than heavy roleplay."</p>
+                    <p class="text-slate-700 mb-4">Some time ago, I met a player on Facebook. [cite: 29] He was representing two other players who were looking for a professional paid Dungeons & Dragons game. [cite: 30] They contacted me because I was running a D&D campaign at that time. [cite: 31] While we were talking, he explained that they were still undecided about joining the group because they used to prefer campaigns with more exploration and combat rather than heavy roleplay. [cite: 32]</p>
                 </div>
             </div>
 
             <div id="slide-7" class="slide-item">
                 <div class="card slide-content-wrapper">
-                    <h2 class="section-title">Case Study: A Negotiation Success</h2>
-                    <p class="text-center text-slate-600 mb-10 max-w-2xl mx-auto">This case study recounts an experience where Mauricio successfully negotiated with new clients, highlighting his flexible approach and focus on mutual benefit. It demonstrates how initial hesitation was transformed into a strong, long-term client relationship.</p>
+                    <h2 class="section-title">Part 2 - Describe a Situation [cite: 29]</h2>
                     <h3 class="card-subtitle">The Offer and Negotiation</h3>
-                    <p>"To address their hesitation, I believed a flexible solution was the best choice in that situation. So, I offered them a 20% discount for the first month if they decided to hire me. From my perspective, this was a reasonable offer, considering they were a group of three clients joining at once. During our negotiation, I set only one condition: all of them had to participate in the free Session Zero together. They agreed, and everything went very smoothly. As a great outcome, the game continued for several months, and they even renewed their subscription for a second campaign, this time paying the full price."</p>
+                    <p class="text-slate-700 mb-4">I believe that offering a flexible solution was the best choice in that situation. [cite: 33] So, I offered them a 20% discount for the first month if they decided to hire me. [cite: 34] From my perspective, it was a reasonable offer because they were coming as a group of three clients at once. [cite: 35]</p>
+                    <p class="text-slate-700 mb-4">While we were negotiating, I made only one condition: all of them had to do the free Session Zero together. [cite: 36] They agreed, and everything went very smoothly. As a result, the game continued for more months, and they even renewed their subscription for the second campaign, paying the full price. [cite: 37]</p>
                 </div>
             </div>
 
             <div id="slide-8" class="slide-item">
                 <div class="card slide-content-wrapper lg:flex lg:items-center lg:gap-8">
                     <div class="lg:w-1/2">
-                        <h2 class="section-title">Case Study: A Negotiation Success</h2>
-                        <h3 class="card-subtitle">Consequences: A Win-Win Outcome</h3>
-                        <p>"This situation truly was a win-win for everyone involved. From their perspective, they found the Game Master they were looking for, offering the playstyle they preferred, and they even received a discount for the first month. On my side, I successfully acquired three new clients at once, who later became loyal customers. Initially, they had some doubts about paying for a professional Game Master, but once they experienced the quality of my work, those doubts completely disappeared."</p>
+                        <h2 class="section-title">Part 3 - Analyze the Consequences [cite: 40]</h2>
+                        <h3 class="card-subtitle">A Win-Win Outcome</h3>
+                        <p class="text-slate-700 mb-4">I think it was definitely a win-win situation. [cite: 38] They found the Game Master they were looking for, with the playstyle they wanted, and still got a discount in the first month. [cite: 38] On the other hand, I managed to get three clients at the same time, and they became loyal customers. [cite: 39]</p>
+                        <p class="text-slate-700 mb-4">I believe that everyone was very happy with the result of the negotiation. [cite: 41] They used to feel unsure about paying for a professional Game Master, but after they experienced the quality of my work, that doubt disappeared. [cite: 41]</p>
                     </div>
                      <img src="dnd1.png" 
                          alt="Illustrative placeholder for a Virtual Tabletop in-game view (From PDF Page 3)" 
@@ -308,37 +263,35 @@
                          class="placeholder-img rounded-lg shadow-lg mb-4 lg:mb-0 lg:w-1/2 mx-auto max-w-full h-auto"
                          onerror="this.classList.add('placeholder-img'); this.src='https://placehold.co/500x350/e2e8f0/475569?text=Image+Error';">
                     <div class="lg:w-1/2">
-                        <h2 class="section-title">Case Study: A Negotiation Success</h2>
+                        <h2 class="section-title">Part 3 - Analyze the Consequences [cite: 40]</h2>
                         <h3 class="card-subtitle">Building Trust & Strong Relationships</h3>
-                        <p>"As a result of this positive experience, the trust between us increased significantly. Our professional relationship became much stronger, and they could clearly see that I was the right Game Master for them. This happened because they realized that my sessions provided exactly the experience they were looking for, effectively combining the right amount of combat, exploration, and, most importantly, fun."</p>
+                        <p class="text-slate-700 mb-4">There was a significant increase in trust between us. [cite: 42] Our professional relationship became much stronger, and they could clearly see that I was the right Game Master for them. [cite: 42] This happened because they realized that my sessions delivered exactly the experience they were looking for combining the right amount of combat, exploration, and fun. [cite: 43]</p>
                     </div>
                 </div>
             </div>
 
             <div id="slide-10" class="slide-item">
                 <div class="card slide-content-wrapper">
-                    <h2 class="section-title">Lessons Learned</h2>
-                    <p class="text-center text-slate-600 mb-10 max-w-2xl mx-auto">"In conclusion..." This final section shares the valuable insights Mauricio gained from his experiences, particularly the negotiation case study. These reflections underscore his professional growth and approach to client relationships and service adaptation.</p>
+                    <h2 class="section-title">Part 4 - Draw a Conclusion [cite: 44]</h2>
                     <h3 class="card-subtitle">More Than Just Money</h3>
-                    <p>"What I gained from this negotiation was much more than just financial compensation. I built trust with these clients, strengthened my professional reputation, and established long-term relationships. These outcomes are incredibly valuable and will undoubtedly make a huge positive difference in my career going forward."</p>
+                    <p class="text-slate-700 mb-4">In my opinion, what I gained when I won this negotiation was much more than just money. [cite: 45] I built trust, strengthened my professional reputation, and created a long-term relationship with these clients. [cite: 46] This is something that can make a huge difference in my career. [cite: 47]</p>
                 </div>
             </div>
 
             <div id="slide-11" class="slide-item">
                 <div class="card slide-content-wrapper">
-                    <h2 class="section-title">Lessons Learned</h2>
-                    <p class="text-center text-slate-600 mb-10 max-w-2xl mx-auto">This final section shares the valuable insights Mauricio gained from his experiences, particularly the negotiation case study. These reflections underscore his professional growth and approach to client relationships and service adaptation.</p>
+                    <h2 class="section-title">Part 4 - Draw a Conclusion [cite: 44]</h2>
                     <h3 class="card-subtitle">Confidence and Flexibility in Negotiation</h3>
-                    <p>"Nowadays, I approach similar negotiations with much more confidence. I've learned that offering flexible solutions is key to attracting and retaining good clients. I firmly believe that in any deal, both sides should feel like they are winning, so I always try to listen carefully and find solutions that fit both the client's needs and my own."</p>
+                    <p class="text-slate-700 mb-4">Nowadays, I'm used to handling this kind of negotiation with more confidence because I understand that offering flexible solutions may attract and retain good clients. [cite: 48] I also believe that both sides should feel like they are winning when making a deal. [cite: 49] That's why I always try to listen carefully and find a solution that fits both the clients' needs and mine. [cite: 50]</p>
                 </div>
             </div>
 
             <div id="slide-12" class="slide-item">
                 <div class="card slide-content-wrapper">
-                    <h2 class="section-title">Lessons Learned</h2>
-                    <p class="text-center text-slate-600 mb-10 max-w-2xl mx-auto">This final section shares the valuable insights Mauricio gained from his experiences, particularly the negotiation case study. These reflections underscore his professional growth and approach to client relationships and service adaptation.</p>
+                    <h2 class="section-title">Part 4 - Draw a Conclusion [cite: 44]</h2>
                     <h3 class="card-subtitle">Adaptation and Strategic Sacrifice</h3>
-                    <p>"This experience taught me the importance of adapting my service when needed, as long as it doesn't compromise my quality or professional integrity. It also showed me that a small sacrifice, like a temporary discount, can lead to significantly larger gains in the future. I believe I made the right decision by offering the discount; if I had insisted on the full price from the start, they might not have joined. Therefore, I will likely use this strategy again if I encounter a similar situation, because it truly works."</p>
+                    <p class="text-slate-700 mb-4">This situation taught me that I must be prepared to adapt my service when necessary, as long as it doesn't compromise my quality or my professional boundaries. [cite: 51] It also showed me that sometimes a small sacrifice, like giving a temporary discount, might lead to bigger gains in the future. [cite: 52]</p>
+                    <p class="text-slate-700 mb-4">I could have insisted on the full price from the beginning, but if I had done that, they might have decided not to join. [cite: 53] So, I believe I made the right decision. In the future, I will probably use this strategy again if I face a similar situation, because it really works. [cite: 54]</p>
                 </div>
             </div>
         </div>
@@ -354,7 +307,7 @@
     </div>
 
     <footer class="header text-amber-50 py-8 text-center">
-        <p>&copy; <span id="currentYear"></span> Wizard of RPG - Mauricio Ramos Canavarro Costa. All rights reserved.</p>
+        <p>&copy; <span id="currentYear"></span> RPG Wizard - Mauricio Ramos Canavarro Costa. All rights reserved.</p>
         <p class="text-xs mt-1 text-slate-300">Content based on "Lesson 4.pdf" material. Placeholder images used.</p>
     </footer>
 
@@ -426,10 +379,9 @@
         navLinks.forEach(link => {
             link.addEventListener('click', (event) => {
                 event.preventDefault(); // Prevent default anchor jump
-                const targetSectionId = link.dataset.section;
-                const targetIndex = sectionToSlideIndexMap[targetSectionId];
-                if (targetIndex !== undefined) {
-                    showSlide(targetIndex);
+                const targetSlideIndex = parseInt(link.dataset.slideTarget);
+                if (!isNaN(targetSlideIndex)) {
+                    showSlide(targetSlideIndex);
                 }
                 // Close mobile menu if open
                 if (!mobileMenu.classList.contains('hidden')) {
@@ -454,7 +406,7 @@
             const pricingChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: ['D&D Weekly (R$)', 'RPG Bi-weekly (R$)'],
+                    labels: ['D&D weekly (R$)', 'RPG biweekly (R$)'],
                     datasets: [{
                         label: 'Monthly Cost per Head',
                         data: [120, 70],
